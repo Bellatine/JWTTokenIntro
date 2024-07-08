@@ -26,13 +26,16 @@ public class SecurityConfigurer {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request.requestMatchers("/**" )
-                        .permitAll()).addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("/**")
+                        .permitAll())
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationManagerBuilder auth) throws Exception {
+    public AuthenticationManager customAuthenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder auth = http.getSharedObject(AuthenticationManagerBuilder.class);
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
         return auth.build();
     }
@@ -42,5 +45,3 @@ public class SecurityConfigurer {
         return new BCryptPasswordEncoder();
     }
 }
-
-
